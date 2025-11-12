@@ -1,0 +1,139 @@
+/* ===== BASE ===== */
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  font-family: "Inter", "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+  background-color: #f5f6fa;
+  color: #333;
+  line-height: 1.7;
+}
+
+.container {
+  max-width: 960px;
+  margin: 0 auto;
+  padding: 60px 20px;
+}
+
+h1 {
+  font-size: 2.3rem;
+  font-weight: 700;
+  margin-bottom: 25px;
+}
+
+p {
+  font-size: 1.05rem;
+  margin-bottom: 15px;
+  color: #555;
+}
+
+/* ===== ABOUT PAGE ===== */
+.about-page {
+  background: linear-gradient(160deg, #e6f0ff 0%, #ffffff 90%);
+  border-radius: 16px;
+  padding: 60px 40px;
+  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.08);
+}
+
+.about-page h1 {
+  color: #0a84ff;
+}
+
+.about-page .highlight {
+  color: #0051a8;
+  font-weight: 600;
+}
+
+/* ===== CONTACT PAGE ===== */
+.contact-page {
+  background: linear-gradient(160deg, #fff3f3 0%, #ffffff 90%);
+  border-radius: 16px;
+  padding: 60px 40px;
+  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.08);
+}
+
+.contact-page h1 {
+  color: #e53e3e;
+}
+
+.contact-page form {
+  margin-top: 25px;
+}
+
+.contact-page input,
+.contact-page textarea {
+  width: 100%;
+  padding: 14px 16px;
+  margin-bottom: 18px;
+  border: 1px solid #ddd;
+  border-radius: 10px;
+  font-size: 1rem;
+  transition: border 0.3s ease;
+}
+
+.contact-page input:focus,
+.contact-page textarea:focus {
+  outline: none;
+  border-color: #e53e3e;
+}
+
+.contact-page button {
+  background-color: #e53e3e;
+  color: #fff;
+  border: none;
+  border-radius: 10px;
+  padding: 12px 25px;
+  font-size: 1rem;
+  cursor: pointer;
+  transition: background 0.3s ease;
+}
+
+.contact-page button:hover {
+  background-color: #c53030;
+}
+
+/* ===== PRIVACY PAGE ===== */
+.privacy-page {
+  background: linear-gradient(160deg, #edfff3 0%, #ffffff 90%);
+  border-radius: 16px;
+  padding: 60px 40px;
+  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.08);
+}
+
+.privacy-page h1 {
+  color: #2ecc71;
+}
+
+.privacy-page ul {
+  margin: 15px 0;
+  padding-left: 25px;
+}
+
+.privacy-page li {
+  margin-bottom: 10px;
+  color: #444;
+}
+footer {
+  font-family: "Inter", "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+  background-color: #f5f6fa;
+  text-align: center;
+  padding: 35px;
+  color: rgb(35, 238, 126);
+  width: 100%;
+  font-size: 0.9em;
+  margin-top: auto;
+}
+
+/* ===== RESPONSIVE ===== */
+@media (max-width: 768px) {
+  .container {
+    padding: 40px 15px;
+  }
+
+  h1 {
+    font-size: 1.9rem;
+  }
+}

@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <title>Tanjona Service - Auto-relevé client</title>
+
+  <!-- Description & Keywords (unique version) -->
+  <meta name="description" content="Soumettez facilement votre relevé d’index client en ligne avec Tanjona Service. Service rapide, sécurisé et accessible sur mobile.Seulement pour Nos client Jirama Mahitsy">
+  <meta name="keywords" content="JIRAMA MAHITSY, auto relevé, index client, tanjona service, relevé en ligne, relevé compteur">
+
+  <meta name="author" content="Tanjona Service">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+  <!-- Canonical : pejy officiel -->
+  <link rel="canonical" href="https://auto-releve.pages.dev/">
+
+  <!-- Open Graph (Facebook, WhatsApp, etc.) -->
+  <meta property="og:title" content="Auto-relevé client - Tanjona Service">
+  <meta property="og:description" content="Soumettez votre relevé mensuel facilement depuis votre téléphone ou ordinateur.">
+  <meta property="og:type" content="website">
+  <meta property="og:url" content="https://auto-releve.pages.dev/">
+  <meta property="og:image" content="https://auto-releve.pages.dev/jirama.jpg">
+
+  <!-- Google Site Verification (pour .pages.dev) -->
+  <meta name="google-site-verification" content="A3aG5gCnEjNfsrG0ZRUQp7RS-Ek_tP7rnL1n4elpFqU" />
+  
+
+  <!-- Favicon & Manifest -->
+  <link rel="icon" type="image/jpg" href="jirama.jpg">
+  <link rel="manifest" href="manifest.json">
+  <link rel="stylesheet" href="body.css">
+
+  <!-- Google Analytics 4 -->
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-CPDY6M1P0H"></script>
+  <script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){dataLayer.push(arguments);}
+    gtag('js', new Date());
+    gtag('config', 'G-CPDY6M1P0H', {
+      'page_title': 'Auto-Relevé',
+      'page_path': '/'
+    });
+  </script>
+</head>
+
+
+<body>
+  <header>
+    <img src="jirama.jpg" alt="Logo Tanjona Service">
+    <h1>Tanjona Service<br>
+      Bienvenue sur votre plateforme de relevé en ligne</h1>
+    <p>Envoyez vos relevés en toute simplicité et sécurité.<br>
+      Disponible du <strong>15 au 31 de chaque mois</strong>.<br>
+      Soumettez facilement votre relevé d’index client en ligne avec Tanjona Service.</p>
+    <nav>
+      <a href="index.html">Accueil</a> |
+      <a href="about.html">À propos</a> |
+      <a href="contact.html">Contact</a> |
+      <a href="privacy.html">Politique de confidentialité</a>
+    </nav>
+  </header>
+
+  <main>
+    <h2>SCANNER-MOI</h2>
+    <div class="qr-container">
+      <img src="codeQR.png" alt="QR Code vers formulaire">
+    </div>
+
+    <a href="formulaire.html" class="btn">👉 Envoyer Auto-relevé</a>
+
+    <div class="pub">
+      <p>📢 <strong>Besoin d’un autre service ?</strong><br>
+      Cliquez ici pour découvrir nos offres de formation en excel VBA, Création website html/Python, Installation et assistance à distance.</p>
+      <a href="https://formation-by-tanjona.netlify.app/" class="btn">Découvrir plus</a>
+    </div>
+  </main>
+
+  <footer>
+    © 2025 Tanjona Service — Tous droits réservés.
+    <nav>
+      <a href="index.html">Accueil</a> |
+      <a href="about.html">À propos</a> |
+      <a href="contact.html">Contact</a> |
+      <a href="privacy.html">Politique de confidentialité</a>
+      </nav>
+  </footer>
+  <script>
+    // PWA install prompt
+    window.addEventListener('beforeinstallprompt', e => {
+      e.preventDefault();
+      let deferredPrompt = e;
+      const btn = document.createElement('button');
+      btn.textContent = "📲 Installer l’application";
+      btn.style.position = 'fixed';
+      btn.style.bottom = '20px';
+      btn.style.left = '50%';
+      btn.style.transform = 'translateX(-50%)';
+      btn.style.padding = '10px 20px';
+      btn.style.background = '#1a73e8';
+      btn.style.color = 'white';
+      btn.style.border = 'none';
+      btn.style.borderRadius = '8px';
+      btn.style.boxShadow = '0 2px 6px rgba(0,0,0,0.2)';
+      btn.onclick = () => {
+        deferredPrompt.prompt();
+      };
+      document.body.appendChild(btn);
+    });
+  </script>
+
+</body>
+</html>

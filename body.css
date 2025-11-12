@@ -1,0 +1,125 @@
+    * { box-sizing: border-box; }
+    html,body { height:100%; }
+    body {
+      font-family: "Poppins", sans-serif;
+      margin: 0;
+      padding: 0;
+      background: #b9cae4;
+      color: #333;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      min-height: 100vh;
+    }
+    header {
+      display: flex;
+      box-shadow:0 2px 5px rgba(0,0,0,0.2);
+      margin-bottom:100px;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+      background: #0a54c4;
+      color: white;
+      width: 100%;           /* ✅ tsy mihoatra ny écran */
+      box-sizing: border-box;
+      margin: 0;
+      padding: 25px 15px;    /* ✅ padding ampy ho an’ny desktop sy mobile */
+
+
+    }
+
+
+
+    header img {
+      width: 90px;   
+      height: 90px;  
+      border-radius: 50%;
+      background: rgb(252, 116, 6);
+      padding: 8px;
+      margin-bottom: 10px;
+      
+    }
+
+    h1 {
+      margin: 0;
+      font-size: 1.8em;
+    }
+
+    main {
+      flex: 1;
+      text-align: center;
+      padding: 20px;
+      background: #eeb6dd;
+      max-width: 600px;
+      width: 100%;
+    }
+
+    .qr-container {
+      margin: 30px auto;
+    }
+
+    .qr-container img {
+      width: 180px;
+      height: 180px;
+      border: 4px solid #1a73e8;
+      border-radius: 15px;
+      padding: 8px;
+      background: white;
+    }
+
+    .btn {
+      background: #1a73e8;
+      color: white;
+      padding: 14px 24px;
+      border: none;
+      border-radius: 10px;
+      font-size: 1.1em;
+      cursor: pointer;
+      transition: 0.3s;
+      text-decoration: none;
+      display: inline-block;
+      margin-top: 15px;
+    }
+
+    .btn:hover {
+      background: #0d5fd0;
+    }
+
+    .pub {
+      margin-top: 40px;
+      background: #fff;
+      padding: 20px;
+      background: #7bee70;
+      border-radius: 10px;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+    }
+
+    footer {
+      font-family: "Inter", "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+      background: #b9cae4;
+      text-align: center;
+      padding: 35px;
+      color: rgb(12, 35, 240);
+      width: 100%;
+      font-size: 0.9em;
+      margin-top: auto;
+    }
+
+    @media (max-width: 600px) {
+      header {
+        padding: 25px 8px;
+      }
+
+      header img {
+        width: 90px;   
+        height: 90px;  
+      }
+      h1 {
+        font-size: 1.4em;
+      }
+      .qr-container img {
+        width: 150px;
+        height: 150px;
+      }
+    }
