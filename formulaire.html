@@ -22,6 +22,14 @@
       'page_path': '/auto-releve'
     });
   </script>
+  <script>
+    console.log("DEBUG: script loaded ✅");
+    console.log("Promise:", typeof Promise);
+    console.log("fetch:", typeof fetch);
+    console.log("Swal:", typeof Swal);
+    window.addEventListener("error", e => console.log("JS Error:", e.message));
+  </script>
+
 
   <link rel="canonical" href="https://auto-releve.pages.dev/formulaire.html">
   <meta property="og:title" content="Auto-relevé client - Tanjona Service">
