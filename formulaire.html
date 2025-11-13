@@ -6,10 +6,10 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <link rel="icon" type="image/jpg" href="jirama.jpg">
 
-  <!-- ✅ Polyfills et SweetAlert2 (version stable Android 5+) -->
+  <!-- ✅ Polyfills & SweetAlert2 (compatibles Android 5+) -->
   <script src="https://cdn.jsdelivr.net/npm/promise-polyfill/dist/polyfill.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/whatwg-fetch@3.6.2/dist/fetch.umd.js"></script>
-  <script src="sweetalert2.all.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/sweetalert2@9.10.13/dist/sweetalert2.all.min.js"></script>
 
   <!-- Google Analytics -->
   <script async src="https://www.googletagmanager.com/gtag/js?id=G-CPDY6M1P0H"></script>
@@ -21,15 +21,9 @@
       'page_title': 'Auto-Relevé',
       'page_path': '/auto-releve'
     });
-
-    console.log("DEBUG: script loaded ✅");
-    console.log("Promise:", typeof Promise);
-    console.log("fetch:", typeof fetch);
-    console.log("Swal:", typeof Swal);
-    window.addEventListener("error", e => console.log("JS Error:", e.message));
   </script>
 
-
+  <!-- Meta & SEO -->
   <link rel="canonical" href="https://auto-releve.pages.dev/formulaire.html">
   <meta property="og:title" content="Auto-relevé client - Tanjona Service">
   <meta property="og:description" content="Soumettez votre relevé mensuel facilement depuis votre téléphone ou ordinateur.">
@@ -38,19 +32,19 @@
   <meta property="og:image" content="https://auto-releve.pages.dev/jirama.jpg">
 
   <style>
-    body { font-family: Arial,sans-serif; margin:0; background-color:#b8d0f0; }
-    header { background:#1a73e8; color:white; text-align:center; padding:10px; box-shadow:0 2px 5px rgba(0,0,0,0.2); }
-    header img { width:90px; height:90px; border-radius:50%; background:rgb(247,114,6); padding:8px; margin-bottom:10px; }
-    h1 { font-size:1.8em; margin-bottom:5px; }
-    form { background:rgb(92,133,122); max-width:400px; margin:20px auto; padding:25px; border-radius:12px; box-shadow:0 2px 6px rgba(0,0,0,0.15); }
-    label { display:block; margin-top:15px; font-weight:bold; color:#333; }
-    input, button { width:100%; padding:10px; margin-top:5px; border-radius:6px; border:1px solid #ccc; box-sizing:border-box; font-size:1em; }
-    input[readonly]{background-color:#eee;color:#666;cursor:not-allowed;}
-    button { margin-top:20px; background-color:#1a73e8; color:white; border:none; cursor:pointer; font-weight:bold; transition:0.3s; }
-    button:hover { background-color:#0d5fd0; }
-    footer { text-align:center; margin-top:40px; padding:10px; font-size:0.9em; color:#555; background-color:#b8d0f0; }
-    footer a { color:#1a73e8; text-decoration:none; font-weight:bold; }
-    footer a:hover { text-decoration:underline; }
+    body { font-family: Arial, sans-serif; margin: 0; background-color: #b8d0f0; }
+    header { background: #1a73e8; color: white; text-align: center; padding: 10px; box-shadow: 0 2px 5px rgba(0,0,0,0.2); }
+    header img { width: 90px; height: 90px; border-radius: 50%; background: rgb(247,114,6); padding: 8px; margin-bottom: 10px; }
+    h1 { font-size: 1.8em; margin-bottom: 5px; }
+    form { background: rgb(92,133,122); max-width: 400px; margin: 20px auto; padding: 25px; border-radius: 12px; box-shadow: 0 2px 6px rgba(0,0,0,0.15); }
+    label { display: block; margin-top: 15px; font-weight: bold; color: #333; }
+    input, button { width: 100%; padding: 10px; margin-top: 5px; border-radius: 6px; border: 1px solid #ccc; box-sizing: border-box; font-size: 1em; }
+    input[readonly] { background-color: #eee; color: #666; cursor: not-allowed; }
+    button { margin-top: 20px; background-color: #1a73e8; color: white; border: none; cursor: pointer; font-weight: bold; transition: 0.3s; }
+    button:hover { background-color: #0d5fd0; }
+    footer { text-align: center; margin-top: 40px; padding: 10px; font-size: 0.9em; color: #555; background-color: #b8d0f0; }
+    footer a { color: #1a73e8; text-decoration: none; font-weight: bold; }
+    footer a:hover { text-decoration: underline; }
     @media(max-width:600px){h1{font-size:1.4em;}form{margin:15px;padding:20px;}}
   </style>
 </head>
@@ -107,43 +101,57 @@
     © 2025 Tanjona Service — Tous droits réservés.
   </footer>
 
-<!-- 🚀 SCRIPT HYBRIDE COMPATIBLE -->
+<!-- 🚀 SCRIPT HYBRIDE COMPATIBLE CHROME & WEBVIEW -->
 <script>
 (function() {
   const scriptURL = "https://script.google.com/macros/s/AKfycbzuFKcGRC5a3Nrz0vXJiwd-XoMIgKsfOJkX85mgBoyVzReU_FwnjLf78Cws7JZYaub6/exec";
+  const form = document.getElementById("form");
   const dateInput = document.getElementById("date");
+
   const today = new Date();
   const yyyy = today.getFullYear();
   const mm = String(today.getMonth() + 1).padStart(2, "0");
   const dd = String(today.getDate()).padStart(2, "0");
-  dateInput.value = yyyy + "-" + mm + "-" + dd;
+  dateInput.value = `${yyyy}-${mm}-${dd}`;
 
+  // 🔍 Détection WebView (champ de recherche Android)
+  const isWebView = /wv/.test(navigator.userAgent) || /WebView/.test(navigator.userAgent);
+  if (isWebView) {
+    Swal.fire({
+      title: "Navigateur intégré détecté",
+      text: "⚠️ Votre navigateur Android intégré limite certaines fonctions.\n👉 Pour de meilleures performances, ouvrez cette page avec Google Chrome.",
+      icon: "info"
+    });
+  }
+
+  // ✅ Validation du formulaire
   function validateForm() {
-    var nom = document.getElementById("nom").value.trim();
-    var reference = document.getElementById("reference").value.trim();
-    var index = document.getElementById("index").value;
-    var adresse = document.getElementById("adresse").value.trim();
-    var telephone = document.getElementById("telephone").value.trim();
-    var email = document.getElementById("email").value.trim();
-    var date = document.getElementById("date").value;
+    const nom = form.nom.value.trim();
+    const reference = form.reference.value.trim();
+    const index = form.index.value.trim();
+    const adresse = form.adresse.value.trim();
+    const telephone = form.telephone.value.trim();
+    const email = form.email.value.trim();
+    const date = form.date.value;
 
     if (nom === "") return "⚠️ Le nom complet est obligatoire.";
-    if (!/^196\\d{8}$/.test(reference)) return "⚠️ La référence client doit commencer par 196 et comporter 11 chiffres.";
+    if (!/^196\d{8}$/.test(reference)) return "⚠️ La référence client doit commencer par 196 et comporter 11 chiffres.";
     if (index === "" || isNaN(index) || Number(index) < 0) return "⚠️ L’index actuel doit être un nombre positif.";
     if (adresse === "") return "⚠️ L’adresse est obligatoire.";
     if (!/^0[0-9]{9}$/.test(telephone)) return "⚠️ Le téléphone doit contenir 10 chiffres et commencer par 0.";
-    if (!/^[^\\s@]+@[^\\s@]+\\.[^\\s@]+$/.test(email)) return "⚠️ L’adresse e-mail est invalide.";
-    var jour = parseInt(date.split("-")[2], 10);
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) return "⚠️ L’adresse e-mail est invalide.";
+
+    const jour = parseInt(date.split("-")[2], 10);
     if (isNaN(jour) || jour < 11 || jour > 31) return "⚠️ La date du relevé doit être comprise entre le 11 et la fin du mois.";
     return null;
   }
 
-  document.getElementById("form").addEventListener("submit", function(e) {
+  // 📤 Envoi du formulaire
+  form.addEventListener("submit", function(e) {
     e.preventDefault();
 
-    var error = validateForm();
-    if (error) { Swal.fire("Erreur", error, "warning"); return; }
-    if (!confirm("Voulez-vous vraiment soumettre ce relevé ?")) return;
+    const error = validateForm();
+    if (error) return Swal.fire("Erreur", error, "warning");
 
     Swal.fire({
       title: "Veuillez patienter...",
@@ -152,15 +160,49 @@
       didOpen: () => Swal.showLoading()
     });
 
-    var formData = "nom=" + encodeURIComponent(document.getElementById("nom").value.trim()) +
-                   "&reference=" + encodeURIComponent(document.getElementById("reference").value.trim()) +
-                   "&index=" + encodeURIComponent(document.getElementById("index").value) +
-                   "&adresse=" + encodeURIComponent(document.getElementById("adresse").value.trim()) +
-                   "&telephone=" + encodeURIComponent(document.getElementById("telephone").value.trim()) +
-                   "&email=" + encodeURIComponent(document.getElementById("email").value.trim()) +
-                   "&date=" + encodeURIComponent(document.getElementById("date").value);
+    const formData =
+      "nom=" + encodeURIComponent(form.nom.value.trim()) +
+      "&reference=" + encodeURIComponent(form.reference.value.trim()) +
+      "&index=" + encodeURIComponent(form.index.value.trim()) +
+      "&adresse=" + encodeURIComponent(form.adresse.value.trim()) +
+      "&telephone=" + encodeURIComponent(form.telephone.value.trim()) +
+      "&email=" + encodeURIComponent(form.email.value.trim()) +
+      "&date=" + encodeURIComponent(form.date.value);
 
-    if (window.fetch) {
+    // 🚀 Envoi via fetch ou fallback XHR (Android WebView)
+    if (!window.fetch || isWebView) {
+      console.log("⚙️ Mode compatibilité XHR activé");
+      var xhr = new XMLHttpRequest();
+      xhr.open("POST", scriptURL, true);
+      xhr.setRequestHeader("Content-Type", "application/x-www-form-urlencoded");
+      xhr.onreadystatechange = function() {
+        if (xhr.readyState === 4) {
+          Swal.close();
+          if (xhr.status === 200) {
+            try {
+              const result = JSON.parse(xhr.responseText);
+              if (result.result === "success") {
+                Swal.fire("Succès 🎉", result.message, "success");
+                form.reset();
+                dateInput.value = `${yyyy}-${mm}-${dd}`;
+              } else {
+                Swal.fire("Information", result.message || "Problème lors de l'envoi.", "info");
+              }
+            } catch (err) {
+              Swal.fire("Erreur", "❌ Réponse du serveur invalide.", "error");
+            }
+          } else {
+            Swal.fire("Erreur", "❌ Erreur réseau (" + xhr.status + ")", "error");
+          }
+        }
+      };
+      xhr.onerror = function() {
+        Swal.close();
+        Swal.fire("Erreur", "❌ Impossible d'envoyer les données (connexion instable).", "error");
+      };
+      xhr.send(formData);
+    } else {
+      console.log("⚙️ Mode fetch moderne activé");
       fetch(scriptURL, {
         method: "POST",
         headers: {"Content-Type": "application/x-www-form-urlencoded"},
@@ -171,8 +213,8 @@
         Swal.close();
         if (result.result === "success") {
           Swal.fire("Succès 🎉", result.message, "success");
-          document.getElementById("form").reset();
-          dateInput.value = yyyy + "-" + mm + "-" + dd;
+          form.reset();
+          dateInput.value = `${yyyy}-${mm}-${dd}`;
         } else {
           Swal.fire("Information", result.message || "Problème lors de l'envoi.", "info");
         }
@@ -181,36 +223,6 @@
         Swal.close();
         Swal.fire("Erreur réseau", "❌ " + err.message, "error");
       });
-    } else {
-      var xhr = new XMLHttpRequest();
-      xhr.open("POST", scriptURL, true);
-      xhr.setRequestHeader("Content-Type", "application/x-www-form-urlencoded");
-      xhr.onreadystatechange = function() {
-        if (xhr.readyState === 4) {
-          Swal.close();
-          if (xhr.status === 200) {
-            try {
-              var result = JSON.parse(xhr.responseText);
-              if (result.result === "success") {
-                Swal.fire("Succès 🎉", result.message, "success");
-                document.getElementById("form").reset();
-                dateInput.value = yyyy + "-" + mm + "-" + dd;
-              } else {
-                Swal.fire("Information", result.message || "Problème lors de l'envoi.", "info");
-              }
-            } catch (err) {
-              Swal.fire("Erreur", "❌ Erreur de traitement du serveur.", "error");
-            }
-          } else {
-            Swal.fire("Erreur", "❌ Erreur réseau (" + xhr.status + ")", "error");
-          }
-        }
-      };
-      xhr.onerror = function() {
-        Swal.close();
-        Swal.fire("Erreur", "❌ Impossible d'envoyer les données.", "error");
-      };
-      xhr.send(formData);
     }
   });
 })();
