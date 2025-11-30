@@ -177,8 +177,8 @@
           cancelButtonText: "Annuler",
         }).then((result) => {
 
-        if (!result.isConfirmed) {
-        return; // Tsy manohy raha CANCEL
+          if (!result.isConfirmed) {
+            return; // Tsy manohy raha CANCEL
           }
 
           // Validation
@@ -196,10 +196,6 @@
           });
 
           // ATO NO MIAINGA NY SUBMISSION MARINA
-        
-      });
-
-
 
       const formData =
         "nom=" + encodeURIComponent(form.nom.value.trim()) +
@@ -265,6 +261,7 @@
           Swal.fire("Erreur réseau", "❌ " + err.message, "error");
         });
       }
+    });
     });
 })();
 </script>
