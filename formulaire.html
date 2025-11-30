@@ -145,22 +145,90 @@
     return null;
   }
 
-  form.addEventListener("submit", function(e) {
+  function sendForm(formData) {
+    if(!window.fetch || isWebView) {
+      // ⚙️ Fallback XHR pour WebView Android
+      var xhr = new XMLHttpRequest();
+      xhr.open("POST", scriptURL, true);
+      xhr.setRequestHeader("Content-Type", "application/x-www-form-urlencoded");
+      xhr.onreadystatechange = function() {
+        if(xhr.readyState===4){
+          Swal.close();
+          if(xhr.status===200){
+            try{
+              const result = JSON.parse(xhr.responseText);
+              if(result.result==="success"){
+                Swal.fire("Succès 🎉", result.message, "success");
+                form.reset();
+                dateInput.value = `${yyyy}-${mm}-${dd}`;
+              } else {
+                Swal.fire("Information", result.message || "Problème lors de l'envoi.", "info");
+              }
+            }catch(e){
+              Swal.fire("Erreur", "❌ Réponse serveur invalide.", "error");
+            }
+          } else {
+            Swal.fire("Erreur", "❌ Erreur réseau ("+xhr.status+")", "error");
+          }
+        }
+      };
+      xhr.onerror = function(){
+        Swal.close();
+        Swal.fire("Erreur", "❌ Impossible d'envoyer les données (connexion instable).", "error");
+      };
+      xhr.send(formData);
+    } else {
+      // ✅ fetch moderne
+      fetch(scriptURL, {
+        method:"POST",
+        headers:{"Content-Type":"application/x-www-form-urlencoded"},
+        body: formData
+      })
+      .then(res=>res.json())
+      .then(result=>{
+        Swal.close();
+        if(result.result==="success"){
+          Swal.fire("Succès 🎉", result.message, "success");
+          form.reset();
+          dateInput.value = `${yyyy}-${mm}-${dd}`;
+        } else {
+          Swal.fire("Information", result.message || "Problème lors de l'envoi.", "info");
+        }
+      })
+      .catch(err=>{
+        Swal.close();
+        Swal.fire("Erreur réseau", "❌ "+err.message, "error");
+      });
+    }
+  }
+
+  form.addEventListener("submit", function(e){
     e.preventDefault();
 
     Swal.fire({
-      title: "Confirmation",
-      text: "Voulez-vous envoyer votre relevé ?",
-      icon: "question",
-      showCancelButton: true,
-      confirmButtonText: "Oui, envoyer",
-      cancelButtonText: "Annuler",
-    }).then((result) => {
-      if (!result.isConfirmed) return; // Tsy manohy raha CANCEL
+      title:"Confirmation",
+      text:"Voulez-vous envoyer votre relevé ?",
+      icon:"question",
+      showCancelButton:true,
+      confirmButtonText:"Oui, envoyer",
+      cancelButtonText:"Annuler"
+    }).then(result=>{
+      if(!result.isConfirmed) return;
 
       const error = validateForm();
-      if (error) return Swal.fire("Erreur", error, "warning");
+      if(error){
+        Swal.fire("Erreur", error, "warning");
+        return;
+      }
 
+      Swal.fire({
+        title:"Veuillez patienter...",
+        text:"⏳ Envoi en cours...",
+        allowOutsideClick:false,
+        didOpen:()=>Swal.showLoading()
+      });
+
+      // Préparer formData
       const formData =
         "nom=" + encodeURIComponent(form.nom.value.trim()) +
         "&reference=" + encodeURIComponent(form.reference.value.trim()) +
@@ -170,60 +238,11 @@
         "&email=" + encodeURIComponent(form.email.value.trim()) +
         "&date=" + encodeURIComponent(form.date.value);
 
-      Swal.fire({
-        title: "Veuillez patienter...",
-        text: "⏳ Envoi en cours...",
-        allowOutsideClick: false,
-        didOpen: () => Swal.showLoading()
-      });
-
-      if (!window.fetch || isWebView) {
-        var xhr = new XMLHttpRequest();
-        xhr.open("POST", scriptURL, true);
-        xhr.setRequestHeader("Content-Type", "application/x-www-form-urlencoded");
-        xhr.onreadystatechange = function() {
-          if (xhr.readyState === 4) {
-            Swal.close();
-            if (xhr.status === 200) {
-              const result = JSON.parse(xhr.responseText);
-              if (result.result === "success") {
-                Swal.fire("Succès 🎉", result.message, "success");
-                form.reset();
-                dateInput.value = `${yyyy}-${mm}-${dd}`;
-              } else {
-                Swal.fire("Information", result.message || "Problème lors de l'envoi.", "info");
-              }
-            } else {
-              Swal.fire("Erreur", "❌ Erreur réseau (" + xhr.status + ")", "error");
-            }
-          }
-        };
-        xhr.send(formData);
-      } else {
-        fetch(scriptURL, {
-          method: "POST",
-          headers: { "Content-Type": "application/x-www-form-urlencoded" },
-          body: formData
-        })
-        .then(res => res.json())
-        .then(result => {
-          Swal.close();
-          if (result.result === "success") {
-            Swal.fire("Succès 🎉", result.message, "success");
-            form.reset();
-            dateInput.value = `${yyyy}-${mm}-${dd}`;
-          } else {
-            Swal.fire("Information", result.message || "Problème lors de l'envoi.", "info");
-          }
-        })
-        .catch(err => {
-          Swal.close();
-          Swal.fire("Erreur réseau", "❌ " + err.message, "error");
-        });
-      }
+      sendForm(formData);
     });
   });
 })();
+
 </script>
 </body>
 </html>
