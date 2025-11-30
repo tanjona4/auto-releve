@@ -99,7 +99,8 @@
       <input type="email" id="email" name="email" required placeholder="example@gmail.com">
     </label>
     <label>Date du relevé :
-      <input type="date" id="date" name="date" required>
+      <input type="date" id="date" name="date" required onkeydown="return false;" onmousedown="return false;">
+
     </label>
     <button type="submit">📤 Envoyer</button>
     <a href="index.html" class="btn">👉 Retour</a>
@@ -163,19 +164,41 @@
     return null;
   }
 
-  // 📤 Envoi du formulaire
+   // 📤 Envoi du formulaire
   form.addEventListener("submit", function(e) {
-    e.preventDefault();
+      e.preventDefault();
 
-    const error = validateForm();
-    if (error) return Swal.fire("Erreur", error, "warning");
+      // Confirmation utilisateur AVANT l'envoi
+      Swal.fire({
+          title: "Confirmation",
+          text: "Voulez-vous envoyer votre relevé ?",
+          icon: "question",
+          showCancelButton: true,
+          confirmButtonText: "Oui, envoyer",
+          cancelButtonText: "Annuler",
+      }).then((result) => {
 
-    Swal.fire({
-      title: "Veuillez patienter...",
-      text: "⏳ Envoi en cours, cela ne prendra que quelques secondes.",
-      allowOutsideClick: false,
-      didOpen: () => Swal.showLoading()
-    });
+          if (!result.isConfirmed) {
+              return; // Tsy manohy raha CANCEL
+          }
+
+          // Validation
+          const error = validateForm();
+          if (error) {
+              return Swal.fire("Erreur", error, "warning");
+          }
+
+          // Message d’attente
+          Swal.fire({
+              title: "Veuillez patienter...",
+              text: "⏳ Envoi en cours, cela ne prendra que quelques secondes.",
+              allowOutsideClick: false,
+              didOpen: () => Swal.showLoading()
+          });
+
+          // ATO NO MIAINGA NY SUBMISSION MARINA
+          sendFormToServer();
+      });
 
     const formData =
       "nom=" + encodeURIComponent(form.nom.value.trim()) +
