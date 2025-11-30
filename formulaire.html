@@ -48,7 +48,7 @@
     @media(max-width:600px){h1{font-size:1.4em;}form{margin:15px;padding:20px;}}
     .btn { background: #1a73e8; color: white; padding: 14px 24px; border: none; border-radius: 10px; font-size: 1.1em; cursor: pointer; transition: 0.3s; text-decoration: none; display: inline-block; margin-top: 15px; }
     .btn:hover { background: #0d5fd0; }
-    footer nav a { margin: 0 5px; } /* éviter conflit btn */
+    footer nav a { margin: 0 5px; }
   </style>
 </head>
 
@@ -128,7 +128,6 @@
     });
   }
 
-  // Validation du formulaire
   function validateForm() {
     const nom = form.nom.value.trim();
     const reference = form.reference.value.trim();
@@ -153,32 +152,26 @@
     return null;
   }
 
-  // Envoi du formulaire
   function sendForm(formData) {
     if(!window.fetch || isWebView) {
       // Fallback XHR
       var xhr = new XMLHttpRequest();
       xhr.open("POST", scriptURL, true);
-      xhr.setRequestHeader("Content-Type", "application/x-www-form-urlencoded");
       xhr.onreadystatechange = function() {
         if(xhr.readyState===4){
           Swal.close();
           submitBtn.disabled = false;
-          if(xhr.status===200){
-            try{
-              const result = JSON.parse(xhr.responseText);
-              if(result.result==="success"){
-                Swal.fire("Succès 🎉", result.message, "success");
-                form.reset();
-                dateInput.value = `${yyyy}-${mm}-${dd}`;
-              } else {
-                Swal.fire("Information", result.message || "Problème lors de l'envoi.", "info");
-              }
-            }catch(e){
-              Swal.fire("Erreur", "❌ Réponse serveur invalide.", "error");
+          try {
+            const result = JSON.parse(xhr.responseText);
+            if(result.result==="success"){
+              Swal.fire("Succès 🎉", result.message, "success");
+              form.reset();
+              dateInput.value = `${yyyy}-${mm}-${dd}`;
+            } else {
+              Swal.fire("Information", result.message || "Problème lors de l'envoi.", "info");
             }
-          } else {
-            Swal.fire("Erreur", "❌ Erreur réseau ("+xhr.status+")", "error");
+          } catch(e) {
+            Swal.fire("Erreur", "❌ Réponse serveur invalide.", "error");
           }
         }
       };
@@ -190,24 +183,25 @@
       xhr.send(formData);
     } else {
       // fetch moderne
-      fetch(scriptURL, {
-        method:"POST",
-        headers:{"Content-Type":"application/x-www-form-urlencoded"},
-        body: formData
-      })
-      .then(res=>res.json())
-      .then(result=>{
+      fetch(scriptURL, { method:"POST", body: formData })
+      .then(res => res.text()) // debugger en texte
+      .then(text => {
         Swal.close();
         submitBtn.disabled = false;
-        if(result.result==="success"){
-          Swal.fire("Succès 🎉", result.message, "success");
-          form.reset();
-          dateInput.value = `${yyyy}-${mm}-${dd}`;
-        } else {
-          Swal.fire("Information", result.message || "Problème lors de l'envoi.", "info");
+        try {
+          const result = JSON.parse(text);
+          if(result.result === "success") {
+            Swal.fire("Succès 🎉", result.message, "success");
+            form.reset();
+            dateInput.value = `${yyyy}-${mm}-${dd}`;
+          } else {
+            Swal.fire("Information", result.message || "Problème lors de l'envoi.", "info");
+          }
+        } catch(e) {
+          Swal.fire("Erreur", "❌ Réponse serveur invalide.", "error");
         }
       })
-      .catch(err=>{
+      .catch(err => {
         Swal.close();
         submitBtn.disabled = false;
         Swal.fire("Erreur réseau", "❌ "+err.message, "error");
@@ -238,24 +232,17 @@
         title:"Veuillez patienter...",
         text:"⏳ Envoi en cours...",
         allowOutsideClick:false,
-        didOpen:()=>Swal.showLoading()
+        didOpen: () => Swal.showLoading()
       });
 
-      // Préparer formData
-      const formData = new URLSearchParams({
-        nom: form.nom.value.trim(),
-        reference: form.reference.value.trim(),
-        index: form.index.value.trim(),
-        adresse: form.adresse.value.trim(),
-        telephone: form.telephone.value.trim(),
-        email: form.email.value.trim(),
-        date: form.date.value
-      }).toString();
+      // Préparer formData via FormData
+      const formData = new FormData(form);
 
       submitBtn.disabled = true;
       sendForm(formData);
     });
   });
+
 })();
 </script>
 
