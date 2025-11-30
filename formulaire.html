@@ -103,251 +103,131 @@
     <br><br>
     © 2025 Tanjona Service — Tous droits réservés.
   </footer>
-
 <script>
 (function() {
   const scriptURL = "https://script.google.com/macros/s/AKfycbzuFKcGRC5a3Nrz0vXJiwd-XoMIgKsfOJkX85mgBoyVzReU_FwnjLf78Cws7JZYaub6/exec";
   const form = document.getElementById("form");
   const dateInput = document.getElementById("date");
-  const submitBtn = form.querySelector('button[type="submit"]');
 
-  // Date initial
   const today = new Date();
   const yyyy = today.getFullYear();
   const mm = String(today.getMonth() + 1).padStart(2, "0");
   const dd = String(today.getDate()).padStart(2, "0");
   dateInput.value = `${yyyy}-${mm}-${dd}`;
 
-  // Helper: build localStorage key (per client reference + month)
-  function storageKeyFor(reference) {
-    // Key => autoreleve_{reference}_{YYYY-MM}
-    const keyMonth = `${yyyy}-${mm}`;
-    return `autoreleve_${reference}_${keyMonth}`;
-  }
-
-  // Helper: set item with expiry (timestamp in ms)
-  function setWithExpiry(key, value, expiresAtTs) {
-    try {
-      const item = { value: value, expiresAt: expiresAtTs };
-      localStorage.setItem(key, JSON.stringify(item));
-    } catch (e) {
-      console.warn("localStorage error:", e);
-    }
-  }
-  // Helper: get item and check expiry
-  function getWithExpiry(key) {
-    try {
-      const raw = localStorage.getItem(key);
-      if (!raw) return null;
-      const item = JSON.parse(raw);
-      if (!item.expiresAt || Date.now() > item.expiresAt) {
-        localStorage.removeItem(key);
-        return null;
-      }
-      return item.value;
-    } catch (e) {
-      console.warn("localStorage parse error:", e);
-      return null;
-    }
-  }
-
-  // Compute end-of-month timestamp (23:59:59)
-  function endOfMonthTimestamp(year, monthZeroBased) {
-    // monthZeroBased: 0..11
-    const nextMonth = new Date(year, monthZeroBased + 1, 1);
-    const ts = nextMonth.getTime() - 1; // last ms of current month
-    return ts;
-  }
-  const monthExpiryTs = endOfMonthTimestamp(today.getFullYear(), today.getMonth());
-
-  // Detect WebView
+  // 🔍 Détection WebView (champ de recherche Android)
   const isWebView = /wv/.test(navigator.userAgent) || /WebView/.test(navigator.userAgent);
-
-  // Disable submit UI
-  function disableSubmitUI() {
-    submitBtn.disabled = true;
-    submitBtn.style.opacity = "0.6";
-    submitBtn.style.cursor = "not-allowed";
-  }
-  function enableSubmitUI() {
-    submitBtn.disabled = false;
-    submitBtn.style.opacity = "";
-    submitBtn.style.cursor = "";
+  if (isWebView) {
+    Swal.fire({
+      title: "Navigateur intégré détecté",
+      text: "⚠️ Votre navigateur Android intégré limite certaines fonctions.\n👉 Pour de meilleures performances, ouvrez cette page avec Google Chrome.",
+      icon: "info"
+    });
   }
 
-  // Validation (same as before)
+  // ✅ Validation du formulaire
   function validateForm() {
     const nom = form.nom.value.trim();
     const reference = form.reference.value.trim();
-    const index = form.index.value;
+    const index = form.index.value.trim();
     const adresse = form.adresse.value.trim();
     const telephone = form.telephone.value.trim();
     const email = form.email.value.trim();
     const date = form.date.value;
 
     if (nom === "") return "⚠️ Le nom complet est obligatoire.";
-    if (!/^196\\d{8}$/.test(reference)) return "⚠️ La référence client doit commencer par 196 et comporter 11 chiffres.";
+    if (!/^196\d{8}$/.test(reference)) return "⚠️ La référence client doit commencer par 196 et comporter 11 chiffres.";
     if (index === "" || isNaN(index) || Number(index) < 0) return "⚠️ L’index actuel doit être un nombre positif.";
     if (adresse === "") return "⚠️ L’adresse est obligatoire.";
     if (!/^0[0-9]{9}$/.test(telephone)) return "⚠️ Le téléphone doit contenir 10 chiffres et commencer par 0.";
-    if (!/^[^\\s@]+@[^\\s@]+\\.[^\\s@]+$/.test(email)) return "⚠️ L’adresse e-mail est invalide.";
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) return "⚠️ L’adresse e-mail est invalide.";
+
     const jour = parseInt(date.split("-")[2], 10);
     if (isNaN(jour) || jour < 11 || jour > 31) return "⚠️ La date du relevé doit être comprise entre le 11 et la fin du mois.";
     return null;
   }
 
-  // On load: check if this reference already submitted this month
-  function checkDuplicateOnLoad() {
-    const reference = (form.reference && form.reference.value || "").trim();
-    if (!reference) return; // tsy misy reference raha mbola tsy feno
-
-    const key = storageKeyFor(reference);
-    const flag = getWithExpiry(key);
-    if (flag) {
-      // efa nandefa ity référence ity ny mpanjifa amin'ity volana ity
-      disableSubmitUI();
-      const msg = "📌 Vous avez déjà soumis votre relevé pour ce mois. Vous ne pouvez pas soumettre deux fois pendant le même mois.";
-      // Use Swal if available, otherwise alert
-      if (window.Swal) Swal.fire("Information", msg, "info");
-      else alert(msg);
-    }
-  }
-
-  // Also watch reference field changes and re-check (so if user types ref that already sent)
-  if (form.reference) {
-    form.reference.addEventListener("blur", function() {
-      checkDuplicateOnLoad();
-    });
-  }
-
-  // Main submit handler
+  // 📤 Envoi du formulaire
   form.addEventListener("submit", function(e) {
     e.preventDefault();
 
-    // validation
     const error = validateForm();
-    if (error) {
-      if (window.Swal) Swal.fire("Erreur", error, "warning");
-      else alert(error);
-      return;
-    }
+    if (error) return Swal.fire("Erreur", error, "warning");
 
-    const reference = form.reference.value.trim();
-    const key = storageKeyFor(reference);
-    if (getWithExpiry(key)) {
-      // Double-check and block
-      const msg = "📌 Vous avez déjà soumis votre relevé pour ce mois. Merci.";
-      if (window.Swal) Swal.fire("Information", msg, "info");
-      else alert(msg);
-      disableSubmitUI();
-      return;
-    }
+    Swal.fire({
+      title: "Veuillez patienter...",
+      text: "⏳ Envoi en cours, cela ne prendra que quelques secondes.",
+      allowOutsideClick: false,
+      didOpen: () => Swal.showLoading()
+    });
 
-    // Confirm and proceed
-    const proceed = confirm("Voulez-vous vraiment soumettre ce relevé ?");
-    if (!proceed) return;
-
-    // UI lock to prevent double-click
-    disableSubmitUI();
-    if (window.Swal) {
-      Swal.fire({
-        title: "Veuillez patienter...",
-        text: "⏳ Envoi en cours, cela ne prendra que quelques secondes.",
-        allowOutsideClick: false,
-        didOpen: () => Swal.showLoading()
-      });
-    } else {
-      alert("⏳ Envoi en cours...");
-    }
-
-    // prepare data
     const formData =
       "nom=" + encodeURIComponent(form.nom.value.trim()) +
-      "&reference=" + encodeURIComponent(reference) +
+      "&reference=" + encodeURIComponent(form.reference.value.trim()) +
       "&index=" + encodeURIComponent(form.index.value.trim()) +
       "&adresse=" + encodeURIComponent(form.adresse.value.trim()) +
       "&telephone=" + encodeURIComponent(form.telephone.value.trim()) +
       "&email=" + encodeURIComponent(form.email.value.trim()) +
       "&date=" + encodeURIComponent(form.date.value);
 
-    // choose transport: if fetch unsupported or is WebView -> use XHR fallback
-    const useXhr = (!window.fetch) || isWebView;
-
-    function onSuccessServer(result) {
-      // mark as submitted in localStorage until end of month
-      setWithExpiry(key, { submittedAt: Date.now(), serverResponse: result }, monthExpiryTs);
-
-      // close and show success
-      if (window.Swal) {
-        Swal.close();
-        Swal.fire("Succès 🎉", result.message || "Votre relevé a bien été enregistré.", "success");
-      } else {
-        alert("✅ " + (result.message || "Votre relevé a bien été enregistré."));
-      }
-      form.reset();
-      dateInput.value = `${yyyy}-${mm}-${dd}`;
-      disableSubmitUI();
-    }
-
-    function onErrorServer(msg) {
-      if (window.Swal) {
-        Swal.close();
-        Swal.fire("Erreur réseau", "❌ " + msg, "error");
-      } else {
-        alert("❌ " + msg);
-      }
-      // re-enable submit to allow retry
-      enableSubmitUI();
-    }
-
-    if (useXhr) {
-      // XHR path
+    // 🚀 Envoi via fetch ou fallback XHR (Android WebView)
+    if (!window.fetch || isWebView) {
+      console.log("⚙️ Mode compatibilité XHR activé");
       var xhr = new XMLHttpRequest();
       xhr.open("POST", scriptURL, true);
       xhr.setRequestHeader("Content-Type", "application/x-www-form-urlencoded");
       xhr.onreadystatechange = function() {
         if (xhr.readyState === 4) {
+          Swal.close();
           if (xhr.status === 200) {
             try {
-              var result = JSON.parse(xhr.responseText);
-              if (result.result === "success") onSuccessServer(result);
-              else onErrorServer(result.message || "Problème lors de l'envoi.");
+              const result = JSON.parse(xhr.responseText);
+              if (result.result === "success") {
+                Swal.fire("Succès 🎉", result.message, "success");
+                form.reset();
+                dateInput.value = `${yyyy}-${mm}-${dd}`;
+              } else {
+                Swal.fire("Information", result.message || "Problème lors de l'envoi.", "info");
+              }
             } catch (err) {
-              onErrorServer("Réponse serveur invalide.");
+              Swal.fire("Erreur", "❌ Réponse du serveur invalide.", "error");
             }
           } else {
-            onErrorServer("Erreur réseau (" + xhr.status + ")");
+            Swal.fire("Erreur", "❌ Erreur réseau (" + xhr.status + ")", "error");
           }
         }
       };
       xhr.onerror = function() {
-        onErrorServer("Impossible d'envoyer les données (connexion instable).");
+        Swal.close();
+        Swal.fire("Erreur", "❌ Impossible d'envoyer les données (connexion instable).", "error");
       };
       xhr.send(formData);
-
     } else {
-      // fetch path
+      console.log("⚙️ Mode fetch moderne activé");
       fetch(scriptURL, {
         method: "POST",
         headers: {"Content-Type": "application/x-www-form-urlencoded"},
         body: formData
       })
-      .then(function(res) { return res.json(); })
-      .then(function(result) {
-        if (result.result === "success") onSuccessServer(result);
-        else onErrorServer(result.message || "Problème lors de l'envoi.");
+      .then(res => res.json())
+      .then(result => {
+        Swal.close();
+        if (result.result === "success") {
+          Swal.fire("Succès 🎉", result.message, "success");
+          form.reset();
+          dateInput.value = `${yyyy}-${mm}-${dd}`;
+        } else {
+          Swal.fire("Information", result.message || "Problème lors de l'envoi.", "info");
+        }
       })
-      .catch(function(err) {
-        onErrorServer(err.message || "Erreur réseau");
+      .catch(err => {
+        Swal.close();
+        Swal.fire("Erreur réseau", "❌ " + err.message, "error");
       });
     }
-  }); // end submit
-
-  // run initial duplicate check if reference already filled from previous session
-  checkDuplicateOnLoad();
+  });
 })();
 </script>
-
 
 </body>
 </html>
