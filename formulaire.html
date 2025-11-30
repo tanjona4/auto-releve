@@ -153,7 +153,9 @@
 
     const error = validateForm();
     if (error) return Swal.fire("Erreur", error, "warning");
-
+    
+    const proceed = confirm("Voulez-vous vraiment soumettre ce relevé ?");
+    if (!proceed) return;
     Swal.fire({
       title: "Veuillez patienter...",
       text: "⏳ Envoi en cours, cela ne prendra que quelques secondes.",
