@@ -168,36 +168,37 @@
         e.preventDefault();
 
         // Confirmation utilisateur AVANT l'envoi
+        const confirm = await Swal.fire({
+            title:"Confirmer l’envoi ?",
+            text:"Voulez-vous vraiment soumettre ce relevé ?",
+            icon:"question",
+            showCancelButton:true,
+            confirmButtonText:"Oui, envoyer",
+            cancelButtonText:"Annuler"
+        });
+        if(!confirm.isConfirmed) return;
+
+        Swal.fire({title:"Envoi en cours...",text:"Veuillez patienter...",allowOutsideClick:false,didOpen:()=>Swal.showLoading()});
+
+        
+
+        // Validation
+        const error = validateForm();
+        if (error) {
+            return Swal.fire("Erreur", error, "warning");
+        }
+
+        // Message d’attente
         Swal.fire({
-          title: "Confirmation",
-          text: "Voulez-vous envoyer votre relevé ?",
-          icon: "question",
-          showCancelButton: true,
-          confirmButtonText: "Oui, envoyer",
-          cancelButtonText: "Annuler",
-        }).then((result) => {
+            title: "Veuillez patienter...",
+            text: "⏳ Envoi en cours, cela ne prendra que quelques secondes.",
+            allowOutsideClick: false,
+            didOpen: () => Swal.showLoading()
+        });
 
-          if (!result.isConfirmed) {
-            return; // Tsy manohy raha CANCEL
-          }
-
-          // Validation
-          const error = validateForm();
-          if (error) {
-              return Swal.fire("Erreur", error, "warning");
-          }
-
-          // Message d’attente
-          Swal.fire({
-              title: "Veuillez patienter...",
-              text: "⏳ Envoi en cours, cela ne prendra que quelques secondes.",
-              allowOutsideClick: false,
-              didOpen: () => Swal.showLoading()
-          });
-
-          // ATO NO MIAINGA NY SUBMISSION MARINA
-          sendFormToServer();
-          });
+        // ATO NO MIAINGA NY SUBMISSION MARINA
+        sendFormToServer();
+        });
 
       const formData =
         "nom=" + encodeURIComponent(form.nom.value.trim()) +
@@ -264,8 +265,8 @@
         });
       }
     });
-    
-})();
+
+
 </script>
 </body>
 </html>
