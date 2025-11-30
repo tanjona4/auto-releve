@@ -85,7 +85,7 @@
       <input type="email" id="email" name="email" required placeholder="example@gmail.com">
     </label>
     <label>Date du relevé :
-      <input type="date" id="date" name="date" readonly required>
+      <input type="date" id="date" name="date" required>
     </label>
     <button type="submit">📤 Envoyer</button>
     <a href="index.html" class="btn">👉 Retour</a>
@@ -105,113 +105,113 @@
   </footer>
 
 <script>
-(function() {
+(function(){
   const scriptURL = "https://script.google.com/macros/s/AKfycbzuFKcGRC5a3Nrz0vXJiwd-XoMIgKsfOJkX85mgBoyVzReU_FwnjLf78Cws7JZYaub6/exec";
   const form = document.getElementById("form");
   const dateInput = document.getElementById("date");
   const submitBtn = form.querySelector('button[type="submit"]');
 
-  // Date du jour
+  // Remplir date automatiquement
   const today = new Date();
   const yyyy = today.getFullYear();
-  const mm = String(today.getMonth() + 1).padStart(2, "0");
-  const dd = String(today.getDate()).padStart(2, "0");
+  const mm = String(today.getMonth()+1).padStart(2,'0');
+  const dd = String(today.getDate()).padStart(2,'0');
   dateInput.value = `${yyyy}-${mm}-${dd}`;
+  dateInput.readOnly = true; // UI readonly, FormData récupère bien la valeur
 
-  // Détection WebView Android
+  // Détection WebView
   const isWebView = /wv/.test(navigator.userAgent) || /WebView/.test(navigator.userAgent);
-  if (isWebView) {
+  if(isWebView){
     Swal.fire({
-      title: "Navigateur intégré détecté",
-      text: "⚠️ Votre navigateur Android intégré limite certaines fonctions.\n👉 Pour de meilleures performances, ouvrez cette page avec Google Chrome.",
-      icon: "info"
+      title:"Navigateur intégré détecté",
+      text:"⚠️ Votre navigateur Android intégré limite certaines fonctions.\n👉 Pour de meilleures performances, ouvrez cette page avec Google Chrome.",
+      icon:"info"
     });
   }
 
-  function validateForm() {
+  function validateForm(){
     const nom = form.nom.value.trim();
     const reference = form.reference.value.trim();
     const index = form.index.value.trim();
     const adresse = form.adresse.value.trim();
     const telephone = form.telephone.value.trim();
     const email = form.email.value.trim();
-    const date = form.date.value;
+    const dateVal = form.date.value;
 
-    if (nom === "") return "⚠️ Le nom complet est obligatoire.";
-    if (!/^196\d{8}$/.test(reference)) return "⚠️ La référence client doit commencer par 196 et comporter 11 chiffres.";
-    if (index === "" || isNaN(index) || Number(index) < 0) return "⚠️ L’index actuel doit être un nombre positif.";
-    if (adresse === "") return "⚠️ L’adresse est obligatoire.";
-    if (!/^0[0-9]{9}$/.test(telephone)) return "⚠️ Le téléphone doit contenir 10 chiffres et commencer par 0.";
-    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) return "⚠️ L’adresse e-mail est invalide.";
+    if(nom==="") return "⚠️ Le nom complet est obligatoire.";
+    if(!/^196\d{8}$/.test(reference)) return "⚠️ La référence client doit commencer par 196 et comporter 11 chiffres.";
+    if(index==="" || isNaN(index) || Number(index)<0) return "⚠️ L’index actuel doit être un nombre positif.";
+    if(adresse==="") return "⚠️ L’adresse est obligatoire.";
+    if(!/^0[0-9]{9}$/.test(telephone)) return "⚠️ Le téléphone doit contenir 10 chiffres et commencer par 0.";
+    if(!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) return "⚠️ L’adresse e-mail est invalide.";
 
-    const todayDate = new Date(date);
-    const jour = todayDate.getDate();
-    const dernierJour = new Date(todayDate.getFullYear(), todayDate.getMonth()+1, 0).getDate();
-    if (jour < 11 || jour > dernierJour) return "⚠️ La date du relevé doit être comprise entre le 11 et la fin du mois.";
+    const d = new Date(dateVal);
+    const day = d.getDate();
+    const lastDay = new Date(d.getFullYear(), d.getMonth()+1,0).getDate();
+    if(day < 11 || day > lastDay) return "⚠️ La date du relevé doit être comprise entre le 11 et la fin du mois.";
 
     return null;
   }
 
-  function sendForm(formData) {
-    if(!window.fetch || isWebView) {
-      // Fallback XHR
-      var xhr = new XMLHttpRequest();
-      xhr.open("POST", scriptURL, true);
-      xhr.onreadystatechange = function() {
+  function sendForm(formData){
+    if(!window.fetch || isWebView){
+      // XHR fallback
+      const xhr = new XMLHttpRequest();
+      xhr.open("POST", scriptURL,true);
+      xhr.onreadystatechange = function(){
         if(xhr.readyState===4){
           Swal.close();
           submitBtn.disabled = false;
-          try {
-            const result = JSON.parse(xhr.responseText);
-            if(result.result==="success"){
-              Swal.fire("Succès 🎉", result.message, "success");
+          try{
+            const res = JSON.parse(xhr.responseText);
+            if(res.result==="success"){
+              Swal.fire("Succès 🎉", res.message,"success");
               form.reset();
               dateInput.value = `${yyyy}-${mm}-${dd}`;
             } else {
-              Swal.fire("Information", result.message || "Problème lors de l'envoi.", "info");
+              Swal.fire("Info", res.message || "Problème lors de l'envoi","info");
             }
-          } catch(e) {
-            Swal.fire("Erreur", "❌ Réponse serveur invalide.", "error");
+          } catch(e){
+            Swal.fire("Erreur","❌ Réponse serveur invalide","error");
           }
         }
       };
       xhr.onerror = function(){
         Swal.close();
         submitBtn.disabled = false;
-        Swal.fire("Erreur", "❌ Impossible d'envoyer les données (connexion instable).", "error");
+        Swal.fire("Erreur","❌ Impossible d'envoyer (connexion instable)","error");
       };
       xhr.send(formData);
     } else {
       // fetch moderne
       fetch(scriptURL, { method:"POST", body: formData })
-      .then(res => res.text()) // debugger en texte
+      .then(res => res.text())
       .then(text => {
         Swal.close();
         submitBtn.disabled = false;
-        try {
-          const result = JSON.parse(text);
-          if(result.result === "success") {
-            Swal.fire("Succès 🎉", result.message, "success");
+        try{
+          const res = JSON.parse(text);
+          if(res.result==="success"){
+            Swal.fire("Succès 🎉", res.message,"success");
             form.reset();
             dateInput.value = `${yyyy}-${mm}-${dd}`;
           } else {
-            Swal.fire("Information", result.message || "Problème lors de l'envoi.", "info");
+            Swal.fire("Info", res.message || "Problème lors de l'envoi","info");
           }
-        } catch(e) {
-          Swal.fire("Erreur", "❌ Réponse serveur invalide.", "error");
+        } catch(e){
+          Swal.fire("Erreur","❌ Réponse serveur invalide","error");
         }
       })
-      .catch(err => {
+      .catch(err=>{
         Swal.close();
         submitBtn.disabled = false;
-        Swal.fire("Erreur réseau", "❌ "+err.message, "error");
+        Swal.fire("Erreur réseau","❌ "+err.message,"error");
       });
     }
   }
 
   form.addEventListener("submit", function(e){
     e.preventDefault();
-
     Swal.fire({
       title:"Confirmation",
       text:"Voulez-vous envoyer votre relevé ?",
@@ -222,9 +222,9 @@
     }).then(result=>{
       if(!result.isConfirmed) return;
 
-      const error = validateForm();
-      if(error){
-        Swal.fire("Erreur", error, "warning");
+      const err = validateForm();
+      if(err){
+        Swal.fire("Erreur",err,"warning");
         return;
       }
 
@@ -232,17 +232,14 @@
         title:"Veuillez patienter...",
         text:"⏳ Envoi en cours...",
         allowOutsideClick:false,
-        didOpen: () => Swal.showLoading()
+        didOpen: ()=>Swal.showLoading()
       });
 
-      // Préparer formData via FormData
-      const formData = new FormData(form);
-
       submitBtn.disabled = true;
+      const formData = new FormData(form);
       sendForm(formData);
     });
   });
-
 })();
 </script>
 
