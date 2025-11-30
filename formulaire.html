@@ -99,8 +99,7 @@
       <input type="email" id="email" name="email" required placeholder="example@gmail.com">
     </label>
     <label>Date du relevé :
-      <input type="date" id="date" name="date" required onkeydown="return false;" onmousedown="return false;">
-
+      <input type="date" id="date" name="date" readonly required>
     </label>
     <button type="submit">📤 Envoyer</button>
     <a href="index.html" class="btn">👉 Retour</a>
@@ -164,7 +163,7 @@
     return null;
   }
 
-   // 📤 Envoi du formulaire
+  // 📤 Envoi du formulaire
   form.addEventListener("submit", function(e) {
       e.preventDefault();
 
@@ -199,6 +198,8 @@
           // ATO NO MIAINGA NY SUBMISSION MARINA
           sendFormToServer();
       });
+
+
 
     const formData =
       "nom=" + encodeURIComponent(form.nom.value.trim()) +
