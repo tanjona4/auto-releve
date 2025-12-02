@@ -143,7 +143,7 @@
     if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) return "⚠️ L’adresse e-mail est invalide.";
 
     const jour = parseInt(date.split("-")[2], 10);
-    if (isNaN(jour) || jour < 1 || jour > 11) return "⚠️ La date du relevé doit être comprise entre le 11 et la fin du mois.";
+    if (isNaN(jour) || jour < 1 || jour > 31) return "⚠️ La date du relevé doit être comprise entre le 1 et la fin du mois.";
     return null;
   }
 
@@ -243,4 +243,5 @@
 </script>
 
 </body>
+
 </html>
