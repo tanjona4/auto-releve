@@ -143,7 +143,7 @@
     if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) return "⚠️ L’adresse e-mail est invalide.";
 
     const jour = parseInt(date.split("-")[2], 10);
-    if (isNaN(jour) || jour < 11 || jour > 31) return "⚠️ La date du relevé doit être comprise entre le 11 et la fin du mois.";
+    if (isNaN(jour) || jour < 1 || jour > 10) return "⚠️ La date du relevé doit être comprise entre le 11 et la fin du mois.";
     return null;
   }
 
@@ -153,9 +153,17 @@
 
     const error = validateForm();
     if (error) return Swal.fire("Erreur", error, "warning");
-    
-    const proceed = confirm("Voulez-vous vraiment soumettre ce relevé ?");
-    if (!proceed) return;
+
+    Swal.fire({
+        title: "Confirmer l’envoi",
+        text: "Voulez-vous vraiment soumettre ce relevé ?",
+        icon: "question",
+        showCancelButton: true,
+        confirmButtonText: "Oui, envoyer",
+        cancelButtonText: "Annuler"
+    }).then((result) => {
+    if (!result.isConfirmed) return;
+
     Swal.fire({
       title: "Veuillez patienter...",
       text: "⏳ Envoi en cours, cela ne prendra que quelques secondes.",
