@@ -115,7 +115,6 @@
   const dd = String(today.getDate()).padStart(2, "0");
   dateInput.value = `${yyyy}-${mm}-${dd}`;
 
-  // 🔍 Détection WebView (champ de recherche Android)
   const isWebView = /wv/.test(navigator.userAgent) || /WebView/.test(navigator.userAgent);
   if (isWebView) {
     Swal.fire({
@@ -125,7 +124,6 @@
     });
   }
 
-  // ✅ Validation du formulaire
   function validateForm() {
     const nom = form.nom.value.trim();
     const reference = form.reference.value.trim();
@@ -147,7 +145,6 @@
     return null;
   }
 
-  // 📤 Envoi du formulaire
   form.addEventListener("submit", function(e) {
     e.preventDefault();
 
@@ -155,41 +152,38 @@
     if (error) return Swal.fire("Erreur", error, "warning");
 
     Swal.fire({
-        title: "Confirmer l’envoi",
-        text: "Voulez-vous vraiment soumettre ce relevé ?",
-        icon: "question",
-        showCancelButton: true,
-        confirmButtonText: "Oui, envoyer",
-        cancelButtonText: "Annuler"
+      title: "Confirmer l’envoi",
+      text: "Voulez-vous vraiment soumettre ce relevé ?",
+      icon: "question",
+      showCancelButton: true,
+      confirmButtonText: "Oui, envoyer",
+      cancelButtonText: "Annuler"
     }).then((result) => {
-    if (!result.isConfirmed) return;
+      if (!result.isConfirmed) return;
 
-    Swal.fire({
-      title: "Veuillez patienter...",
-      text: "⏳ Envoi en cours, cela ne prendra que quelques secondes.",
-      allowOutsideClick: false,
-      didOpen: () => Swal.showLoading()
-    });
+      Swal.fire({
+        title: "Veuillez patienter...",
+        text: "⏳ Envoi en cours, cela ne prendra que quelques secondes.",
+        allowOutsideClick: false,
+        didOpen: () => Swal.showLoading()
+      });
 
-    const formData =
-      "nom=" + encodeURIComponent(form.nom.value.trim()) +
-      "&reference=" + encodeURIComponent(form.reference.value.trim()) +
-      "&index=" + encodeURIComponent(form.index.value.trim()) +
-      "&adresse=" + encodeURIComponent(form.adresse.value.trim()) +
-      "&telephone=" + encodeURIComponent(form.telephone.value.trim()) +
-      "&email=" + encodeURIComponent(form.email.value.trim()) +
-      "&date=" + encodeURIComponent(form.date.value);
+      const formData =
+        "nom=" + encodeURIComponent(form.nom.value.trim()) +
+        "&reference=" + encodeURIComponent(form.reference.value.trim()) +
+        "&index=" + encodeURIComponent(form.index.value.trim()) +
+        "&adresse=" + encodeURIComponent(form.adresse.value.trim()) +
+        "&telephone=" + encodeURIComponent(form.telephone.value.trim()) +
+        "&email=" + encodeURIComponent(form.email.value.trim()) +
+        "&date=" + encodeURIComponent(form.date.value);
 
-    // 🚀 Envoi via fetch ou fallback XHR (Android WebView)
-    if (!window.fetch || isWebView) {
-      console.log("⚙️ Mode compatibilité XHR activé");
-      var xhr = new XMLHttpRequest();
-      xhr.open("POST", scriptURL, true);
-      xhr.setRequestHeader("Content-Type", "application/x-www-form-urlencoded");
-      xhr.onreadystatechange = function() {
-        if (xhr.readyState === 4) {
-          Swal.close();
-          if (xhr.status === 200) {
+      if (!window.fetch || isWebView) {
+        var xhr = new XMLHttpRequest();
+        xhr.open("POST", scriptURL, true);
+        xhr.setRequestHeader("Content-Type", "application/x-www-form-urlencoded");
+        xhr.onreadystatechange = function() {
+          if (xhr.readyState === 4) {
+            Swal.close();
             try {
               const result = JSON.parse(xhr.responseText);
               if (result.result === "success") {
@@ -199,50 +193,49 @@
               } else {
                 Swal.fire("Information", result.message || "Problème lors de l'envoi.", "info");
               }
-            } catch (err) {
-              Swal.fire("Erreur", "❌ Réponse du serveur invalide.", "error");
+            } catch(err) {
+              Swal.fire("Erreur", "❌ Réponse serveur invalide.", "error");
             }
-          } else {
-            Swal.fire("Erreur", "❌ Erreur réseau (" + xhr.status + ")", "error");
           }
-        }
-      };
-      xhr.onerror = function() {
-        Swal.close();
-        Swal.fire("Erreur", "❌ Impossible d'envoyer les données (connexion instable).", "error");
-      };
-      xhr.send(formData);
-    } else {
-      console.log("⚙️ Mode fetch moderne activé");
-      fetch(scriptURL, {
-        method: "POST",
-        headers: {"Content-Type": "application/x-www-form-urlencoded"},
-        body: formData
-      })
-      .then(res => res.json())
-      .then(result => {
-        Swal.close();
-        if (result.result === "success") {
-          Swal.fire("Succès 🎉", result.message, "success");
-          form.reset();
-          dateInput.value = `${yyyy}-${mm}-${dd}`;
-        } else {
-          Swal.fire("Information", result.message || "Problème lors de l'envoi.", "info");
-        }
-      })
-      .catch(err => {
-        Swal.close();
-        Swal.fire("Erreur réseau", "❌ " + err.message, "error");
+        };
+        xhr.onerror = function() {
+          Swal.close();
+          Swal.fire("Erreur", "❌ Impossible d'envoyer les données (connexion instable).", "error");
+        };
+        xhr.send(formData);
+      } else {
+        fetch(scriptURL, {
+          method: "POST",
+          headers: {"Content-Type": "application/x-www-form-urlencoded"},
+          body: formData
+        })
+        .then(res => res.text())
+        .then(txt => {
+          Swal.close();
+          let result;
+          try { result = JSON.parse(txt); }
+          catch { return Swal.fire("Erreur", "❌ Réponse serveur invalide.", "error"); }
+
+          if(result.result === "success"){
+            Swal.fire("Succès 🎉", result.message, "success");
+            form.reset();
+            dateInput.value = `${yyyy}-${mm}-${dd}`;
+          } else {
+            Swal.fire("Information", result.message || "Problème lors de l'envoi.", "info");
+          }
+        })
+        .catch(err => {
+          Swal.close();
+          Swal.fire("Erreur réseau", "❌ " + err.message, "error");
         });
       }
 
-    });  // <-- FAMARANANA CONFIRMATION
-  });     // <-- FAMARANANA addEventListener
+    }); // fin confirmation
+  }); // fin addEventListener
 
-})();      // <-- FAMARANANA IIFE MARINA
+})(); // fin IIFE
 </script>
 
+
 </body>
-
 </html>
-
