@@ -177,20 +177,27 @@
         "&email=" + encodeURIComponent(form.email.value.trim()) +
         "&date=" + encodeURIComponent(form.date.value);
 
-      if (!window.fetch || isWebView) {
-        var xhr = new XMLHttpRequest();
+      // 📌 XHR fallback ho an'ny WebView
+      function sendXHR() {
+        const xhr = new XMLHttpRequest();
         xhr.open("POST", scriptURL, true);
         xhr.setRequestHeader("Content-Type", "application/x-www-form-urlencoded");
         xhr.onreadystatechange = function() {
           if (xhr.readyState === 4) {
             Swal.close();
-            if(xhr.status === 200){
-              // Tsy miankina amin'ny JSON
-              Swal.fire("Succès 🎉", "Votre relevé a été envoyé avec succès.", "success");
-              form.reset();
-              dateInput.value = `${yyyy}-${mm}-${dd}`;
-            } else {
-              Swal.fire("Erreur", "Erreur réseau (" + xhr.status + ")", "error");
+            try {
+              const result = JSON.parse(xhr.responseText);
+              Swal.fire(
+                result.result === "success" ? "Succès 🎉" : "Information",
+                result.message,
+                result.result === "success" ? "success" : result.alert || "info"
+              );
+              if(result.result === "success") {
+                form.reset();
+                dateInput.value = `${yyyy}-${mm}-${dd}`;
+              }
+            } catch(err) {
+              Swal.fire("Erreur", "❌ Réponse serveur invalide.", "error");
             }
           }
         };
@@ -199,6 +206,10 @@
           Swal.fire("Erreur", "❌ Impossible d'envoyer les données (connexion instable).", "error");
         };
         xhr.send(formData);
+      }
+
+      if (isWebView || !window.fetch) {
+        sendXHR();
       } else {
         fetch(scriptURL, {
           method: "POST",
@@ -208,13 +219,19 @@
         .then(res => res.text())
         .then(txt => {
           Swal.close();
-          // Tsy miankina amin'ny JSON
-          if(txt.includes("success") || txt === "OK"){
-            Swal.fire("Succès 🎉", "Votre relevé a été envoyé avec succès.", "success");
-            form.reset();
-            dateInput.value = `${yyyy}-${mm}-${dd}`;
-          } else {
-            Swal.fire("Information", txt || "Problème lors de l'envoi.", "info");
+          try {
+            const result = JSON.parse(txt);
+            Swal.fire(
+              result.result === "success" ? "Succès 🎉" : "Information",
+              result.message,
+              result.result === "success" ? "success" : result.alert || "info"
+            );
+            if(result.result === "success") {
+              form.reset();
+              dateInput.value = `${yyyy}-${mm}-${dd}`;
+            }
+          } catch(err) {
+            Swal.fire("Erreur", "❌ Réponse serveur invalide.", "error");
           }
         })
         .catch(err => {
@@ -223,10 +240,9 @@
         });
       }
 
-    }); // fin confirmation
-  }); // fin addEventListener
-
-})(); // fin IIFE
+    });
+  });
+})();
 </script>
 
 
