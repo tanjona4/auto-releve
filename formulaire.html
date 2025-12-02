@@ -184,17 +184,13 @@
         xhr.onreadystatechange = function() {
           if (xhr.readyState === 4) {
             Swal.close();
-            try {
-              const result = JSON.parse(xhr.responseText);
-              if (result.result === "success") {
-                Swal.fire("Succès 🎉", result.message, "success");
-                form.reset();
-                dateInput.value = `${yyyy}-${mm}-${dd}`;
-              } else {
-                Swal.fire("Information", result.message || "Problème lors de l'envoi.", "info");
-              }
-            } catch(err) {
-              Swal.fire("Erreur", "❌ Réponse serveur invalide.", "error");
+            if(xhr.status === 200){
+              // Tsy miankina amin'ny JSON
+              Swal.fire("Succès 🎉", "Votre relevé a été envoyé avec succès.", "success");
+              form.reset();
+              dateInput.value = `${yyyy}-${mm}-${dd}`;
+            } else {
+              Swal.fire("Erreur", "Erreur réseau (" + xhr.status + ")", "error");
             }
           }
         };
@@ -212,16 +208,13 @@
         .then(res => res.text())
         .then(txt => {
           Swal.close();
-          let result;
-          try { result = JSON.parse(txt); }
-          catch { return Swal.fire("Erreur", "❌ Réponse serveur invalide.", "error"); }
-
-          if(result.result === "success"){
-            Swal.fire("Succès 🎉", result.message, "success");
+          // Tsy miankina amin'ny JSON
+          if(txt.includes("success") || txt === "OK"){
+            Swal.fire("Succès 🎉", "Votre relevé a été envoyé avec succès.", "success");
             form.reset();
             dateInput.value = `${yyyy}-${mm}-${dd}`;
           } else {
-            Swal.fire("Information", result.message || "Problème lors de l'envoi.", "info");
+            Swal.fire("Information", txt || "Problème lors de l'envoi.", "info");
           }
         })
         .catch(err => {
