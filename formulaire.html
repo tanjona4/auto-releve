@@ -52,16 +52,15 @@
   </footer>
 
 <script>
-(function() {
+(function(){
   const scriptURL = "https://script.google.com/macros/s/AKfycbzuFKcGRC5a3Nrz0vXJiwd-XoMIgKsfOJkX85mgBoyVzReU_FwnjLf78Cws7JZYaub6/exec";
   const form = document.getElementById("form");
   const dateInput = document.getElementById("date");
-
   const today = new Date();
   dateInput.value = today.toISOString().split("T")[0];
 
-  // 🔹 Validation simple
-  function validateForm() {
+  // 🔹 Validation du formulaire
+  function validateForm(){
     const nom = form.nom.value.trim();
     const reference = form.reference.value.trim();
     const index = form.index.value.trim();
@@ -70,7 +69,7 @@
     const email = form.email.value.trim();
     const date = form.date.value;
 
-    if (nom==="") return "⚠️ Le nom complet est obligatoire.";
+    if(nom==="") return "⚠️ Le nom complet est obligatoire.";
     if(!/^196\d{8}$/.test(reference)) return "⚠️ La référence doit commencer par 196 et comporter 11 chiffres.";
     if(index==="" || isNaN(index) || Number(index)<0) return "⚠️ L’index actuel doit être positif.";
     if(adresse==="") return "⚠️ L’adresse est obligatoire.";
@@ -81,7 +80,7 @@
     return null;
   }
 
-  // 🔹 Confirmation et envoi
+  // 🔹 Confirmation + Loading + Envoi
   form.addEventListener("submit", function(e){
     e.preventDefault();
     const error = validateForm();
@@ -94,17 +93,19 @@
       <strong>Date :</strong> ${form.date.value}
     `;
 
+    // 1️⃣ Confirmation
     Swal.fire({
-      title:"Confirmez l'envoi",
+      title: "Confirmez l'envoi",
       html: summary,
-      icon:"question",
-      showCancelButton:true,
-      confirmButtonText:"✅ Confirmer",
-      cancelButtonText:"❌ Annuler",
-      reverseButtons:true
+      icon: "question",
+      showCancelButton: true,
+      confirmButtonText: "✅ Confirmer",
+      cancelButtonText: "❌ Annuler",
+      reverseButtons: true
     }).then((result)=>{
       if(!result.isConfirmed) return;
 
+      // 2️⃣ Loading
       Swal.fire({
         title:"Veuillez patienter...",
         text:"⏳ Envoi en cours...",
@@ -112,6 +113,7 @@
         didOpen:()=>Swal.showLoading()
       });
 
+      // 3️⃣ Préparation des données
       const formData = 
         "nom="+encodeURIComponent(form.nom.value.trim())+
         "&reference="+encodeURIComponent(form.reference.value.trim())+
@@ -121,6 +123,7 @@
         "&email="+encodeURIComponent(form.email.value.trim())+
         "&date="+encodeURIComponent(form.date.value);
 
+      // 4️⃣ Fetch
       fetch(scriptURL,{
         method:"POST",
         headers:{"Content-Type":"application/x-www-form-urlencoded"},
@@ -142,6 +145,7 @@
         Swal.fire("Erreur réseau","❌ "+err.message,"error");
       });
     });
+
   });
 
 })();
