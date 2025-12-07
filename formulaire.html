@@ -137,7 +137,7 @@
 
     if (nom === "") return "⚠️ Le nom complet est obligatoire.";
     if (!/^196\d{8}$/.test(reference)) return "⚠️ La référence client doit commencer par 196 et comporter 11 chiffres.";
-    if (index === "" || isNaN(index) || Number(index) < 0) return "⚠️ L’index actuel doit être un nombre positif.";
+    if (index === "" || isNaN(index) || Number(index) < 100) return "⚠️ L’index actuel doit être un nombre positif.";
     if (adresse === "") return "⚠️ L’adresse est obligatoire.";
     if (!/^0[0-9]{9}$/.test(telephone)) return "⚠️ Le téléphone doit contenir 10 chiffres et commencer par 0.";
     if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) return "⚠️ L’adresse e-mail est invalide.";
@@ -252,4 +252,5 @@
 
 </body>
 </html>
+
 
