@@ -1,184 +1,151 @@
 <!DOCTYPE html>
 <html lang="fr">
 <head>
-<meta charset="UTF-8">
-<title>Auto-relevé client - Tanjona Service</title>
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<script src="https://cdn.jsdelivr.net/npm/sweetalert2@9.10.13/dist/sweetalert2.all.min.js"></script>
-<style>
-body{font-family:Arial,sans-serif;margin:0;background-color:#b8d0f0;}
-header{background:#1a73e8;color:white;text-align:center;padding:10px;box-shadow:0 2px 5px rgba(0,0,0,0.2);}
-header img{width:90px;height:90px;border-radius:50%;background:rgb(247,114,6);padding:8px;margin-bottom:10px;}
-h1{font-size:1.8em;margin-bottom:5px;}
-form{background:rgb(92,133,122);max-width:400px;margin:20px auto;padding:25px;border-radius:12px;box-shadow:0 2px 6px rgba(0,0,0,0.15);}
-label{display:block;margin-top:15px;font-weight:bold;color:#333;}
-input,button{width:100%;padding:10px;margin-top:5px;border-radius:6px;border:1px solid #ccc;box-sizing:border-box;font-size:1em;}
-input[readonly]{background-color:#eee;color:#666;cursor:not-allowed;}
-button{margin-top:20px;background-color:#1a73e8;color:white;border:none;cursor:pointer;font-weight:bold;transition:0.3s;}
-button:hover{background-color:#0d5fd0;}
-footer{text-align:center;margin-top:40px;padding:10px;font-size:0.9em;color:#555;background-color:#b8d0f0;}
-footer a{color:#1a73e8;text-decoration:none;font-weight:bold;}
-footer a:hover{text-decoration:underline;}
-@media(max-width:600px){h1{font-size:1.4em;}form{margin:15px;padding:20px;}}
-.btn{background:#1a73e8;color:white;padding:14px 24px;border:none;border-radius:10px;font-size:1.1em;cursor:pointer;transition:0.3s;text-decoration:none;display:inline-block;margin-top:15px;}
-.btn:hover{background:#0d5fd0;}
-footer nav a{margin:0 5px;}
-</style>
+  <meta charset="UTF-8">
+  <title>Auto-relevé client - Tanjona Service</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="icon" type="image/jpg" href="jirama.jpg">
+
+  <!-- SweetAlert2 & Polyfills -->
+  <script src="https://cdn.jsdelivr.net/npm/promise-polyfill/dist/polyfill.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/whatwg-fetch@3.6.2/dist/fetch.umd.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/sweetalert2@9.10.13/dist/sweetalert2.all.min.js"></script>
+
+  <style>
+    body { font-family: Arial, sans-serif; margin:0; background-color:#b8d0f0; }
+    header { background:#1a73e8; color:white; text-align:center; padding:10px; box-shadow:0 2px 5px rgba(0,0,0,0.2); }
+    header img { width:90px; height:90px; border-radius:50%; background:rgb(247,114,6); padding:8px; margin-bottom:10px; }
+    h1 { font-size:1.8em; margin-bottom:5px; }
+    form { background:rgb(92,133,122); max-width:400px; margin:20px auto; padding:25px; border-radius:12px; box-shadow:0 2px 6px rgba(0,0,0,0.15); }
+    label { display:block; margin-top:15px; font-weight:bold; color:#333; }
+    input, button { width:100%; padding:10px; margin-top:5px; border-radius:6px; border:1px solid #ccc; box-sizing:border-box; font-size:1em; }
+    input[readonly] { background-color:#eee; color:#666; cursor:not-allowed; }
+    button { margin-top:20px; background-color:#1a73e8; color:white; border:none; cursor:pointer; font-weight:bold; transition:0.3s; }
+    button:hover { background-color:#0d5fd0; }
+    footer { text-align:center; margin-top:40px; padding:10px; font-size:0.9em; color:#555; background-color:#b8d0f0; }
+    footer a { color:#1a73e8; text-decoration:none; font-weight:bold; }
+    footer a:hover { text-decoration:underline; }
+    @media(max-width:600px){h1{font-size:1.4em;}form{margin:15px;padding:20px;}}
+  </style>
 </head>
+
 <body>
+  <header>
+    <img src="jirama.jpg" alt="Logo Tanjona Service">
+    <h1>Auto-relevé Client<br>JIRAMA MAHITSY</h1>
+    <p>Soumettez votre relevé d’index sans vous déplacer avec<br>--Tanjona Service Votre partenaire en Informatique--</p>
+  </header>
 
-<header>
-<img src="jirama.jpg" alt="Logo Tanjona Service">
-<h1>Auto-relevé Client<br>JIRAMA MAHITSY</h1>
-<p>Soumettez votre relevé d’index sans vous déplacer avec<br>--Tanjona Service Votre partenaire en Informatique--</p>
-<nav>
-<a href="index.html" class="btn">Accueil</a> |
-<a href="about.html" class="btn">À propos</a> |
-<a href="contact.html" class="btn">Contact</a> |
-<a href="privacy.html" class="btn">Politique de confidentialité</a>
-</nav>  
-</header>
+  <form id="form">
+    <label>Nom complet :<input type="text" id="nom" name="nom" required placeholder="Ex : RASOLONJATOVO Tanjona"></label>
+    <label>Référence client :<input type="text" id="reference" name="reference" maxlength="11" required placeholder="ex : 196XXXXXXXX"></label>
+    <label>Index actuel (RELEVE) :<input type="number" id="index" name="index" min="0" required></label>
+    <label>Adresse :<input type="text" id="adresse" name="adresse" required></label>
+    <label>Téléphone :<input type="tel" id="telephone" name="telephone" maxlength="10" pattern="^0[0-9]{9}$" required placeholder="ex : 03XXXXXXXX"></label>
+    <label>E-mail :<input type="email" id="email" name="email" required placeholder="example@gmail.com"></label>
+    <label>Date du relevé :<input type="date" id="date" name="date" required></label>
+    <button type="submit">📤 Envoyer</button>
+  </form>
 
-<form id="form">
-<label>Nom complet :
-<input type="text" id="nom" name="nom" required placeholder="Ex : RASOLONJATOVO Tanjona">
-</label>
-<label>Référence client :
-<input type="text" id="reference" name="reference" maxlength="11" required placeholder="ex : 196XXXXXXXX">
-</label>
-<label>Index actuel (RELEVE) :
-<input type="number" id="index" name="index" min="0" required>
-</label>
-<label>Adresse :
-<input type="text" id="adresse" name="adresse" required>
-</label>
-<label>Téléphone :
-<input type="tel" id="telephone" name="telephone" maxlength="10" pattern="^0[0-9]{9}$" required placeholder="ex : 03XXXXXXXX">
-</label>
-<label>E-mail :
-<input type="email" id="email" name="email" required placeholder="example@gmail.com">
-</label>
-<label>Date du relevé :
-<input type="date" id="date" name="date" required>
-</label>
-<button type="submit">📤 Envoyer</button>
-<a href="index.html" class="btn">👉 Retour</a>
-</form>
-
-<footer>
-<nav>
-<a href="index.html">Accueil</a> |
-<a href="about.html">À propos</a> |
-<a href="contact.html">Contact</a> |
-<a href="privacy.html">Politique de confidentialité</a>
-</nav>
-🔹 Besoin d’un autre service ?  
-<a href="https://formation-by-tanjona.netlify.app/" target="_blank" rel="noopener noreferrer">Cliquez ici</a>  
-<br><br>
-© 2025 Tanjona Service — Tous droits réservés.
-</footer>
+  <footer>
+    © 2025 Tanjona Service — Tous droits réservés.
+  </footer>
 
 <script>
-(function(){
+(function() {
   const scriptURL = "https://script.google.com/macros/s/AKfycbzuFKcGRC5a3Nrz0vXJiwd-XoMIgKsfOJkX85mgBoyVzReU_FwnjLf78Cws7JZYaub6/exec";
   const form = document.getElementById("form");
   const dateInput = document.getElementById("date");
+
   const today = new Date();
-  const yyyy = today.getFullYear();
-  const mm = String(today.getMonth()+1).padStart(2,"0");
-  const dd = String(today.getDate()).padStart(2,"0");
-  dateInput.value = `${yyyy}-${mm}-${dd}`;
+  dateInput.value = today.toISOString().split("T")[0];
 
-  const isWebView = /wv/.test(navigator.userAgent)||/WebView/.test(navigator.userAgent);
-  if(isWebView){
-    Swal.fire({
-      title:"Navigateur intégré détecté",
-      text:"⚠️ Votre navigateur Android intégré limite certaines fonctions.\n👉 Pour de meilleures performances, ouvrez cette page avec Google Chrome.",
-      icon:"info"
-    });
-  }
+  // 🔹 Validation simple
+  function validateForm() {
+    const nom = form.nom.value.trim();
+    const reference = form.reference.value.trim();
+    const index = form.index.value.trim();
+    const adresse = form.adresse.value.trim();
+    const telephone = form.telephone.value.trim();
+    const email = form.email.value.trim();
+    const date = form.date.value;
 
-  function validateForm(){
-    const nom=form.nom.value.trim();
-    const reference=form.reference.value.trim();
-    const index=form.index.value.trim();
-    const adresse=form.adresse.value.trim();
-    const telephone=form.telephone.value.trim();
-    const email=form.email.value.trim();
-    const date=form.date.value;
-    if(nom==="") return "⚠️ Le nom complet est obligatoire.";
-    if(!/^196\d{8}$/.test(reference)) return "⚠️ La référence client doit commencer par 196 et comporter 11 chiffres.";
-    if(index===""||isNaN(index)||Number(index)<0) return "⚠️ L’index actuel doit être un nombre positif.";
+    if (nom==="") return "⚠️ Le nom complet est obligatoire.";
+    if(!/^196\d{8}$/.test(reference)) return "⚠️ La référence doit commencer par 196 et comporter 11 chiffres.";
+    if(index==="" || isNaN(index) || Number(index)<0) return "⚠️ L’index actuel doit être positif.";
     if(adresse==="") return "⚠️ L’adresse est obligatoire.";
     if(!/^0[0-9]{9}$/.test(telephone)) return "⚠️ Le téléphone doit contenir 10 chiffres et commencer par 0.";
     if(!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) return "⚠️ L’adresse e-mail est invalide.";
-    const jour=parseInt(date.split("-")[2],10);
-    if(isNaN(jour)||jour<11||jour>31) return "⚠️ La date du relevé doit être comprise entre le 11 et la fin du mois.";
+    const jour = parseInt(date.split("-")[2],10);
+    if(isNaN(jour) || jour<11 || jour>31) return "⚠️ La date doit être entre le 11 et fin du mois.";
     return null;
   }
 
-  form.addEventListener("submit",function(e){
+  // 🔹 Confirmation et envoi
+  form.addEventListener("submit", function(e){
     e.preventDefault();
     const error = validateForm();
-    if(error) return Swal.fire("Erreur",error,"warning");
+    if(error) return Swal.fire("Erreur", error, "warning");
+
+    const summary = `
+      <strong>Nom :</strong> ${form.nom.value}<br>
+      <strong>Référence :</strong> ${form.reference.value}<br>
+      <strong>Index :</strong> ${form.index.value}<br>
+      <strong>Date :</strong> ${form.date.value}
+    `;
 
     Swal.fire({
-      title:"Confirmer l’envoi",
-      text:"Voulez-vous vraiment soumettre ce relevé ?",
+      title:"Confirmez l'envoi",
+      html: summary,
       icon:"question",
       showCancelButton:true,
-      confirmButtonText:"Oui, envoyer",
-      cancelButtonText:"Annuler"
+      confirmButtonText:"✅ Confirmer",
+      cancelButtonText:"❌ Annuler",
+      reverseButtons:true
     }).then((result)=>{
       if(!result.isConfirmed) return;
 
       Swal.fire({
         title:"Veuillez patienter...",
-        text:"⏳ Envoi en cours, cela ne prendra que quelques secondes.",
+        text:"⏳ Envoi en cours...",
         allowOutsideClick:false,
         didOpen:()=>Swal.showLoading()
       });
 
-      const formData=
-        "nom="+encodeURIComponent(form.nom.value.trim())+"&"+
-        "reference="+encodeURIComponent(form.reference.value.trim())+"&"+
-        "index="+encodeURIComponent(form.index.value.trim())+"&"+
-        "adresse="+encodeURIComponent(form.adresse.value.trim())+"&"+
-        "telephone="+encodeURIComponent(form.telephone.value.trim())+"&"+
-        "email="+encodeURIComponent(form.email.value.trim())+"&"+
-        "date="+encodeURIComponent(form.date.value);
+      const formData = 
+        "nom="+encodeURIComponent(form.nom.value.trim())+
+        "&reference="+encodeURIComponent(form.reference.value.trim())+
+        "&index="+encodeURIComponent(form.index.value.trim())+
+        "&adresse="+encodeURIComponent(form.adresse.value.trim())+
+        "&telephone="+encodeURIComponent(form.telephone.value.trim())+
+        "&email="+encodeURIComponent(form.email.value.trim())+
+        "&date="+encodeURIComponent(form.date.value);
 
-      // ✅ XHR fallback foana (ultra-safe Android 5.0)
-      const xhr=new XMLHttpRequest();
-      xhr.open("POST",scriptURL,true);
-      xhr.setRequestHeader("Content-Type","application/x-www-form-urlencoded");
-      xhr.onload=function(){
+      fetch(scriptURL,{
+        method:"POST",
+        headers:{"Content-Type":"application/x-www-form-urlencoded"},
+        body:formData
+      })
+      .then(res=>res.json())
+      .then(result=>{
         Swal.close();
-        try{
-          const result=JSON.parse(xhr.responseText);
-          Swal.fire(
-            result.result==="success"?"Succès 🎉":"Information",
-            result.message,
-            result.result==="success"?"success":result.alert||"info"
-          );
-          if(result.result==="success"){
-            form.reset();
-            dateInput.value=`${yyyy}-${mm}-${dd}`;
-          }
-        }catch(err){
-          Swal.fire("Erreur","❌ Réponse serveur invalide.","error");
+        if(result.result==="success"){
+          Swal.fire("Succès 🎉", result.message,"success");
+          form.reset();
+          dateInput.value = new Date().toISOString().split("T")[0];
+        } else {
+          Swal.fire("Info", result.message || "Problème lors de l'envoi.","info");
         }
-      };
-      xhr.onerror=function(){
+      })
+      .catch(err=>{
         Swal.close();
-        Swal.fire("Erreur","❌ Impossible d'envoyer les données (connexion instable).","error");
-      };
-      xhr.send(formData);
+        Swal.fire("Erreur réseau","❌ "+err.message,"error");
+      });
     });
   });
+
 })();
 </script>
 
 </body>
 </html>
-
