@@ -85,7 +85,7 @@
       <input type="email" id="email" name="email" required placeholder="example@gmail.com">
     </label>
     <label>Date du relevé :
-      <input type="date" id="date" name="date" required>
+      <input type="date" id="date" name="date" readonly required>
     </label>
     <button type="submit">📤 Envoyer</button>
     <a href="index.html" class="btn">👉 Retour</a>
@@ -143,7 +143,7 @@
     if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) return "⚠️ L’adresse e-mail est invalide.";
 
     const jour = parseInt(date.split("-")[2], 10);
-    if (isNaN(jour) || jour < 11 || jour > 31) return "⚠️ La date du relevé doit être comprise entre le 11 et la fin du mois.";
+    if (isNaN(jour) || jour < 11 || jour > 31) return "⚠️ Attendez la nouvelle prochaine facture pour soumettre à nouveau.\n La date du relevé doit être comprise entre le 11 et la fin du mois.";
     return null;
   }
 
@@ -252,3 +252,4 @@
 
 </body>
 </html>
+
